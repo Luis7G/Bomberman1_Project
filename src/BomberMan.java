@@ -5,7 +5,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Bomb {
 
@@ -18,14 +21,17 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
 
     boolean isRunning;
     Thread thread;
-    BufferedImage view, concreteTile, blockTile, player;
+    BufferedImage view, concreteTile, blockTile, player, puerta, PowerUp1, PowerUp2, PowerUp3, PowerUp4,
+            PowerUp5, PowerUp6, PowerUp7, PowerUp8;
 
     Bomb bomb;
     int[][] scene;
-    int playerX, playerY;
+    int playerX, playerY, puertaX, puertaY, PowerUp1X, PowerUp1Y,
+            PowerUp2X, PowerUp2Y, PowerUp3X, PowerUp3Y, PowerUp4X, PowerUp4Y,
+            PowerUp5X, PowerUp5Y, PowerUp6X, PowerUp6Y, PowerUp7X, PowerUp7Y, PowerUp8X, PowerUp8Y;
     int tileSize = 16, rows = 13, columns = 15;
     int speed = 4;
-    boolean right, left, up, down;
+    boolean right, left, up, down, enter;
     boolean moving;
     int framePlayer = 0, intervalPlayer = 5, indexAnimPlayer = 0;
     BufferedImage[] playerAnimUp, playerAnimDown, playerAnimRight, playerAnimLeft;
@@ -43,6 +49,24 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
 
     // Agrega esta variable para rastrear si el jugador está vivo
     boolean playerAlive = true;
+    boolean playerAtDoor = false;
+    boolean PowerUp_1 = false;
+    boolean PowerUp_2 = false;
+    boolean PowerUp_3 = false;
+    boolean PowerUp_4 = false;
+    boolean PowerUp_5 = false;
+    boolean PowerUp_6 = false;
+    boolean PowerUp_7 = false;
+    boolean PowerUp_8 = false;
+
+    boolean PowerUp1Collected = false;
+    boolean PowerUp2Collected = false;
+    boolean PowerUp3Collected = false;
+    boolean PowerUp4Collected = false;
+    boolean PowerUp5Collected = false;
+    boolean PowerUp6Collected = false;
+    boolean PowerUp7Collected = false;
+    boolean PowerUp8Collected = false;
 
     final int SCALE = 3;
     final int WIDTH = (tileSize * SCALE) * columns;
@@ -99,11 +123,28 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
             view = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
             BufferedImage spriteSheet = ImageIO.read(getClass().getResource("/sheets.png"));
-            BufferedImage enemy = ImageIO.read(getClass().getResource("/enemigo.png"));
+            BufferedImage puertaImage = ImageIO.read(getClass().getResource("/Puerta.jpg"));
+            BufferedImage PowerUp1Image = ImageIO.read(getClass().getResource("/PowerUP1.png"));
+            BufferedImage PowerUp2Image = ImageIO.read(getClass().getResource("/PowerUp2.jpg"));
+            BufferedImage PowerUp3Image = ImageIO.read(getClass().getResource("/PowerUp3.jpg"));
+            BufferedImage PowerUp4Image = ImageIO.read(getClass().getResource("/PowerUp4.jpg"));
+            BufferedImage PowerUp5Image = ImageIO.read(getClass().getResource("/PowerUp5.jpg"));
+            BufferedImage PowerUp6Image = ImageIO.read(getClass().getResource("/PowerUp6.png"));
+            BufferedImage PowerUp7Image = ImageIO.read(getClass().getResource("/PowerUp7.png"));
+            BufferedImage PowerUp8Image = ImageIO.read(getClass().getResource("/PowerUp8.png"));
 
             concreteTile = spriteSheet.getSubimage(4 * tileSize, 3 * tileSize, tileSize, tileSize);
             blockTile = spriteSheet.getSubimage(3 * tileSize, 3 * tileSize, tileSize, tileSize);
             player = spriteSheet.getSubimage(4 * tileSize, 0, tileSize, tileSize);
+            puerta = puertaImage;
+            PowerUp1 = PowerUp1Image;
+            PowerUp2 = PowerUp2Image;
+            PowerUp3 = PowerUp3Image;
+            PowerUp4 = PowerUp4Image;
+            PowerUp5 = PowerUp5Image;
+            PowerUp6 = PowerUp6Image;
+            PowerUp7 = PowerUp7Image;
+            PowerUp8 = PowerUp8Image;
 
             playerAnimUp = new BufferedImage[3];
             playerAnimDown = new BufferedImage[3];
@@ -170,9 +211,126 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
             };
 
+            do {
+                puertaX = new Random().nextInt(columns);
+                puertaY = new Random().nextInt(rows);
+            } while (scene[puertaY][puertaX] != 0 || (puertaX == 1 && puertaY == 1));
+
+            do {
+                PowerUp1X = new Random().nextInt(columns);
+                PowerUp1Y = new Random().nextInt(rows);
+            } while (scene[PowerUp1Y][PowerUp1X] != 0 || (PowerUp1X == 1 && PowerUp1Y == 1));
+
+            do {
+                PowerUp2X = new Random().nextInt(columns);
+                PowerUp2Y = new Random().nextInt(rows);
+            } while (scene[PowerUp2Y][PowerUp2X] != 0 || (PowerUp2X == 1 && PowerUp2Y == 1));
+
+            do {
+                PowerUp3X = new Random().nextInt(columns);
+                PowerUp3Y = new Random().nextInt(rows);
+            } while (scene[PowerUp3Y][PowerUp3X] != 0 || (PowerUp3X == 1 && PowerUp3Y == 1));
+
+            do {
+                PowerUp4X = new Random().nextInt(columns);
+                PowerUp4Y = new Random().nextInt(rows);
+            } while (scene[PowerUp4Y][PowerUp4X] != 0 || (PowerUp4X == 1 && PowerUp4Y == 1));
+
+            do {
+                PowerUp5X = new Random().nextInt(columns);
+                PowerUp5Y = new Random().nextInt(rows);
+            } while (scene[PowerUp5Y][PowerUp5X] != 0 || (PowerUp5X == 1 && PowerUp5Y == 1));
+
+            do {
+                PowerUp6X = new Random().nextInt(columns);
+                PowerUp6Y = new Random().nextInt(rows);
+            } while (scene[PowerUp6Y][PowerUp6X] != 0 || (PowerUp6X == 1 && PowerUp6Y == 1));
+
+            do {
+                PowerUp7X = new Random().nextInt(columns);
+                PowerUp7Y = new Random().nextInt(rows);
+            } while (scene[PowerUp7Y][PowerUp7X] != 0 || (PowerUp7X == 1 && PowerUp7Y == 1));
+
+            do {
+                PowerUp8X = new Random().nextInt(columns);
+                PowerUp8Y = new Random().nextInt(rows);
+            } while (scene[PowerUp8Y][PowerUp8X] != 0 || (PowerUp8X == 1 && PowerUp8Y == 1));
+
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
                     if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == puertaY && j == puertaX) {
+                        scene[i][j] = 4; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp1Y && j == PowerUp1X) {
+                        scene[i][j] = 6; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp2Y && j == PowerUp2X) {
+                        scene[i][j] = 8; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp3Y && j == PowerUp3X) {
+                        scene[i][j] = 10; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp4Y && j == PowerUp4X) {
+                        scene[i][j] = 12; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp5Y && j == PowerUp5X) {
+                        scene[i][j] = 14; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp6Y && j == PowerUp6X) {
+                        scene[i][j] = 16; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp7Y && j == PowerUp7X) {
+                        scene[i][j] = 18; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+
+                    if (i == PowerUp8Y && j == PowerUp8X) {
+                        scene[i][j] = 20; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
                         if (new Random().nextInt(10) < 5) {
                             scene[i][j] = 2;
                         }
@@ -219,6 +377,51 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         if (down && isFree(playerX, playerY + speed)) {
             playerY += speed;
             moving = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == puertaX && playerY / (tileSize * SCALE) == puertaY) {
+            playerAtDoor = true;
+            playerAlive = false; // Detiene el movimiento del jugador
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp1X && playerY / (tileSize * SCALE) == PowerUp1Y && !PowerUp1Collected) {
+            PowerUp_1 = true;
+            PowerUp1Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp2X && playerY / (tileSize * SCALE) == PowerUp2Y && !PowerUp2Collected) {
+            PowerUp_2 = true;
+            PowerUp2Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp3X && playerY / (tileSize * SCALE) == PowerUp3Y && !PowerUp3Collected) {
+            PowerUp_3 = true;
+            PowerUp3Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp4X && playerY / (tileSize * SCALE) == PowerUp4Y && !PowerUp4Collected) {
+            PowerUp_4 = true;
+            PowerUp4Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp5X && playerY / (tileSize * SCALE) == PowerUp5Y && !PowerUp5Collected) {
+            PowerUp_5 = true;
+            PowerUp5Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp6X && playerY / (tileSize * SCALE) == PowerUp6Y && !PowerUp6Collected) {
+            PowerUp_6 = true;
+            PowerUp6Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp7X && playerY / (tileSize * SCALE) == PowerUp7Y && !PowerUp7Collected) {
+            PowerUp_7 = true;
+            PowerUp7Collected = true;
+        }
+
+        if (playerX / (tileSize * SCALE) == PowerUp8X && playerY / (tileSize * SCALE) == PowerUp8Y && !PowerUp8Collected) {
+            PowerUp_8 = true;
+            PowerUp8Collected = true;
         }
 
         if (bomb != null) {
@@ -283,7 +486,7 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
                     playerAlive = false;
                 }
                 if (Math.abs(bomb.y - playerTileY) == 1 && bomb.x == playerTileX) {
-                    playerAlive = false; 
+                    playerAlive = false;
                 }
             }
         }
@@ -341,6 +544,27 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         // Restablece la posición del jugador
         playerX = (tileSize * SCALE);
         playerY = (tileSize * SCALE);
+        puertaX = (tileSize * SCALE);
+        puertaY = (tileSize * SCALE);
+        PowerUp1X = (tileSize * SCALE);
+        PowerUp1Y = (tileSize * SCALE);
+        PowerUp2X = (tileSize * SCALE);
+        PowerUp2Y = (tileSize * SCALE);
+        PowerUp3X = (tileSize * SCALE);
+        PowerUp3Y = (tileSize * SCALE);
+        PowerUp4X = (tileSize * SCALE);
+        PowerUp4Y = (tileSize * SCALE);
+        PowerUp5X = (tileSize * SCALE);
+        PowerUp5Y = (tileSize * SCALE);
+        PowerUp6X = (tileSize * SCALE);
+        PowerUp6Y = (tileSize * SCALE);
+        PowerUp7X = (tileSize * SCALE);
+        PowerUp7Y = (tileSize * SCALE);
+        PowerUp8X = (tileSize * SCALE);
+        PowerUp8Y = (tileSize * SCALE);
+
+        
+        
 
         // Restablece la variable de control de jugador vivo
         playerAlive = true;
@@ -371,10 +595,126 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
             {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
         };
 
-        // Reinicia los bloques destructibles de manera aleatoria
+        do {
+            puertaX = new Random().nextInt(columns);
+            puertaY = new Random().nextInt(rows);
+        } while (scene[puertaY][puertaX] != 0 || (puertaX == 1 && puertaY == 1));
+
+        do {
+            PowerUp1X = new Random().nextInt(columns);
+            PowerUp1Y = new Random().nextInt(rows);
+        } while (scene[PowerUp1Y][PowerUp1X] != 0 || (PowerUp1X == 1 && PowerUp1Y == 1));
+
+        do {
+            PowerUp2X = new Random().nextInt(columns);
+            PowerUp2Y = new Random().nextInt(rows);
+        } while (scene[PowerUp2Y][PowerUp2X] != 0 || (PowerUp2X == 1 && PowerUp2Y == 1));
+
+        do {
+            PowerUp3X = new Random().nextInt(columns);
+            PowerUp3Y = new Random().nextInt(rows);
+        } while (scene[PowerUp3Y][PowerUp3X] != 0 || (PowerUp3X == 1 && PowerUp3Y == 1));
+
+        do {
+            PowerUp4X = new Random().nextInt(columns);
+            PowerUp4Y = new Random().nextInt(rows);
+        } while (scene[PowerUp4Y][PowerUp4X] != 0 || (PowerUp4X == 1 && PowerUp4Y == 1));
+
+        do {
+            PowerUp5X = new Random().nextInt(columns);
+            PowerUp5Y = new Random().nextInt(rows);
+        } while (scene[PowerUp5Y][PowerUp5X] != 0 || (PowerUp5X == 1 && PowerUp5Y == 1));
+
+        do {
+            PowerUp6X = new Random().nextInt(columns);
+            PowerUp6Y = new Random().nextInt(rows);
+        } while (scene[PowerUp6Y][PowerUp6X] != 0 || (PowerUp6X == 1 && PowerUp6Y == 1));
+
+        do {
+            PowerUp7X = new Random().nextInt(columns);
+            PowerUp7Y = new Random().nextInt(rows);
+        } while (scene[PowerUp7Y][PowerUp7X] != 0 || (PowerUp7X == 1 && PowerUp7Y == 1));
+
+        do {
+            PowerUp8X = new Random().nextInt(columns);
+            PowerUp8Y = new Random().nextInt(rows);
+        } while (scene[PowerUp8Y][PowerUp8X] != 0 || (PowerUp8X == 1 && PowerUp8Y == 1));
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == puertaY && j == puertaX) {
+                    scene[i][j] = 4; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp1Y && j == PowerUp1X) {
+                    scene[i][j] = 6; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp2Y && j == PowerUp2X) {
+                    scene[i][j] = 8; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp3Y && j == PowerUp3X) {
+                    scene[i][j] = 10; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp4Y && j == PowerUp4X) {
+                    scene[i][j] = 12; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp5Y && j == PowerUp5X) {
+                    scene[i][j] = 14; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp6Y && j == PowerUp6X) {
+                    scene[i][j] = 16; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp7Y && j == PowerUp7X) {
+                    scene[i][j] = 18; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                }
+
+                if (i == PowerUp8Y && j == PowerUp8X) {
+                    scene[i][j] = 20; // Usa un valor diferente para representar la puerta
+                } else if (scene[i][j] == 0) {
                     if (new Random().nextInt(10) < 5) {
                         scene[i][j] = 2;
                     }
@@ -384,6 +724,73 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         scene[1][1] = 0;
         scene[2][1] = 0;
         scene[1][2] = 0;
+
+    }
+
+    public void NextNevel() {
+        // Restablece la posición del jugador
+        playerX = (tileSize * SCALE);
+        playerY = (tileSize * SCALE);
+        puertaX = (tileSize * SCALE);
+        puertaY = (tileSize * SCALE);
+
+        // Restablece la variable de control de jugador vivo
+        playerAlive = true;
+
+        lives++;
+
+        if (lives > 3) {
+            lives = 3;
+        }
+        // Limpia la explosión y la bomba si existe
+        if (bomb != null) {
+            scene[bomb.y][bomb.x] = 0;
+            bomb = null;
+        }
+
+        // Restablece la escena
+        scene = new int[][]{
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+        };
+
+        do {
+            puertaX = new Random().nextInt(columns);
+            puertaY = new Random().nextInt(rows);
+        } while (scene[puertaY][puertaX] != 0 || (puertaX == 1 && puertaY == 1));
+
+        // Reinicia los bloques destructibles de manera aleatoria
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                if (scene[i][j] == 0) {
+                    if (new Random().nextInt(10) < 5) {
+                        scene[i][j] = 2;
+                    }
+                    if (i == puertaY && j == puertaX) {
+                        scene[i][j] = 4; // Usa un valor diferente para representar la puerta
+                    } else if (scene[i][j] == 0) {
+                        if (new Random().nextInt(10) < 5) {
+                            scene[i][j] = 2;
+                        }
+                    }
+                }
+            }
+        }
+        scene[1][1] = 0;
+        scene[2][1] = 0;
+        scene[1][2] = 0;
+
     }
 
     public void draw() {
@@ -425,7 +832,79 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         }
 
         if (playerAlive) {
-            g2.drawImage(player, playerX, playerY, size, size, null);
+            if (Math.abs(playerX / (tileSize * SCALE) - puertaX) <= 1 && Math.abs(playerY / (tileSize * SCALE) - puertaY) <= 1) {
+                g2.drawImage(puerta, puertaX * size, puertaY * size, size, size, null);
+            } else {
+                g2.drawImage(player, playerX, playerY, size, size, null);
+            }
+
+            if (playerAtDoor) {
+                g2.setColor(Color.GREEN);
+                g2.setFont(new Font("Arial", Font.BOLD, 48));
+                String winnerText = "You are the winner...";
+                System.exit(0);
+                int textWidth = g2.getFontMetrics().stringWidth(winnerText);
+                g2.drawString(winnerText, (WIDTH - textWidth) / 2, HEIGHT / 2);
+            } else {
+                g2.drawImage(player, playerX, playerY, size, size, null);
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp1X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp1Y) <= 1) {
+
+                if (!PowerUp1Collected) {
+                    g2.drawImage(PowerUp1, PowerUp1X * size, PowerUp1Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp2X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp2Y) <= 1) {
+
+                if (!PowerUp2Collected) {
+                    g2.drawImage(PowerUp2, PowerUp2X * size, PowerUp2Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp3X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp3Y) <= 1) {
+
+                if (!PowerUp3Collected) {
+                    g2.drawImage(PowerUp3, PowerUp3X * size, PowerUp3Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp4X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp4Y) <= 1) {
+
+                if (!PowerUp4Collected) {
+                    g2.drawImage(PowerUp4, PowerUp4X * size, PowerUp4Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp5X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp5Y) <= 1) {
+
+                if (!PowerUp5Collected) {
+                    g2.drawImage(PowerUp5, PowerUp5X * size, PowerUp5Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp6X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp6Y) <= 1) {
+
+                if (!PowerUp6Collected) {
+                    g2.drawImage(PowerUp6, PowerUp6X * size, PowerUp6Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp7X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp7Y) <= 1) {
+
+                if (!PowerUp7Collected) {
+                    g2.drawImage(PowerUp7, PowerUp7X * size, PowerUp7Y * size, size, size, null);
+                }
+            }
+
+            if (Math.abs(playerX / (tileSize * SCALE) - PowerUp8X) <= 1 && Math.abs(playerY / (tileSize * SCALE) - PowerUp8Y) <= 1) {
+
+                if (!PowerUp8Collected) {
+                    g2.drawImage(PowerUp8, PowerUp8X * size, PowerUp8Y * size, size, size, null);
+                }
+            }
+
         } else {
             // Dibuja una imagen de "jugador muerto" o muestra un mensaje de game over
             g2.setColor(Color.RED);
@@ -487,6 +966,10 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             down = true;
         }
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            enter = true;
+            NextNevel();
+        }
     }
 
     @Override
@@ -502,6 +985,9 @@ public class BomberMan extends JPanel implements Runnable, KeyListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
             down = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            enter = false;
         }
     }
 }
